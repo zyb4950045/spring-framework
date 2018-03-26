@@ -169,7 +169,7 @@ public class MockHttpServletResponseTests {
 		response.addCookie(cookie);
 
 		assertEquals("foo=bar; Path=/path; Domain=example.com; " +
-				"Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT; " +
+				"Max-Age=0; Expires=Thu, 1 Jan 1970 00:00:00 GMT; " +
 				"Secure; HttpOnly", response.getHeader(HttpHeaders.SET_COOKIE));
 	}
 
@@ -291,11 +291,17 @@ public class MockHttpServletResponseTests {
 		response.getDateHeader("Last-Modified");
 	}
 
+	@Test  // SPR-16160
+	public void getNonExistentDateHeader() {
+		assertNull(response.getHeader("Last-Modified"));
+		assertEquals(-1, response.getDateHeader("Last-Modified"));
+	}
+
 	@Test  // SPR-10414
 	public void modifyStatusAfterSendError() throws IOException {
 		response.sendError(HttpServletResponse.SC_NOT_FOUND);
 		response.setStatus(HttpServletResponse.SC_OK);
-		assertEquals(response.getStatus(),HttpServletResponse.SC_NOT_FOUND);
+		assertEquals(HttpServletResponse.SC_NOT_FOUND, response.getStatus());
 	}
 
 	@Test  // SPR-10414
@@ -303,7 +309,7 @@ public class MockHttpServletResponseTests {
 	public void modifyStatusMessageAfterSendError() throws IOException {
 		response.sendError(HttpServletResponse.SC_NOT_FOUND);
 		response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,"Server Error");
-		assertEquals(response.getStatus(),HttpServletResponse.SC_NOT_FOUND);
+		assertEquals(HttpServletResponse.SC_NOT_FOUND, response.getStatus());
 	}
 
 }
